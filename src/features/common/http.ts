@@ -43,6 +43,8 @@ function redirectToLogin(): void {
   }
 
   if (window.location.pathname !== "/login") {
+    // El cliente HTTP no es un componente: no puede usar el router de Next.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- redirección centralizada ante un 401
     window.location.assign("/login");
   }
 }

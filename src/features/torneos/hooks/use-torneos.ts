@@ -13,9 +13,12 @@ export type TorneosState =
 export function useTorneos(page: number): TorneosState {
   const [state, setState] = useState<TorneosState>({ status: "loading", page });
 
+  if (state.page !== page) {
+    setState({ status: "loading", page });
+  }
+
   useEffect(() => {
     const controller = new AbortController();
-    setState({ status: "loading", page });
 
     getTorneos(page, controller.signal)
       .then((result) => {
