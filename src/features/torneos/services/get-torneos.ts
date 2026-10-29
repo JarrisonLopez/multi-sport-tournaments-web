@@ -100,9 +100,19 @@ function parseTorneosPage(value: unknown): TorneosPage | null {
   return { pagination, data };
 }
 
-export async function getTorneos(page: number, signal?: AbortSignal): Promise<TorneosPage> {
+export async function getTorneos(
+  page: number,
+  signal?: AbortSignal,
+  limit?: number | null,
+): Promise<TorneosPage> {
   const safePage = Number.isInteger(page) && page > 0 ? page : 1;
-  const payload = await http(`/api/torneos?page=${safePage}`, { signal });
+  const params = new URLSearchParams({ page: String(safePage) });
+
+  if (typeof limit === "number" && Number.isInteger(limit) && limit > 0) {
+    params.set("limit", String(limit));
+  }
+
+  const payload = await http(`/api/torneos?${params.toString()}`, { signal });
   const parsed = parseTorneosPage(payload);
 
   if (!parsed) {

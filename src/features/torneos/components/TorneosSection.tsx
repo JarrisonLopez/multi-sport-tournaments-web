@@ -6,27 +6,51 @@ import { Pagination } from "@/features/common/components/Pagination";
 import { useTorneos, type TorneosState } from "@/features/torneos/hooks/use-torneos";
 import { TorneoCard } from "@/features/torneos/components/TorneoCard";
 
-const CatalogoContext = createContext<TorneosState | null>(null);
+const MAX_PAGE_LIMIT = 50;
+
+type CatalogoValue = {
+  state: TorneosState;
+  limit: number | null;
+};
+
+const CatalogoContext = createContext<CatalogoValue | null>(null);
+
+function readPage(value: string | null): number {
+  return value && /^[1-9]\d*$/.test(value) ? Number(value) : 1;
+}
+
+function readLimit(value: string | null): number | null {
+  if (!value || !/^[1-9]\d*$/.test(value)) {
+    return null;
+  }
+
+  const limit = Number(value);
+  return limit <= MAX_PAGE_LIMIT ? limit : null;
+}
 
 export function CatalogoProvider({ children }: { children: ReactNode }) {
   const params = useSearchParams();
-  const rawPage = params.get("page");
-  const page = rawPage && /^[1-9]\d*$/.test(rawPage) ? Number(rawPage) : 1;
-  const state = useTorneos(page);
+  const page = readPage(params.get("page"));
+  const limit = readLimit(params.get("limit"));
+  const state = useTorneos(page, limit);
 
-  return <CatalogoContext.Provider value={state}>{children}</CatalogoContext.Provider>;
+  return <CatalogoContext.Provider value={{ state, limit }}>{children}</CatalogoContext.Provider>;
+}
+
+function useCatalogoValue(): CatalogoValue {
+  const value = useContext(CatalogoContext);
+  if (!value) {
+    throw new Error("useCatalogo debe usarse dentro de CatalogoProvider.");
+  }
+  return value;
 }
 
 export function useCatalogo(): TorneosState {
-  const state = useContext(CatalogoContext);
-  if (!state) {
-    throw new Error("useCatalogo debe usarse dentro de CatalogoProvider.");
-  }
-  return state;
+  return useCatalogoValue().state;
 }
 
 export function TorneosSection() {
-  const state = useCatalogo();
+  const { state, limit } = useCatalogoValue();
   const [deporte, setDeporte] = useState("todos");
   const torneos = state.status === "ready" ? state.data : [];
   const deportes = torneos.filter(
@@ -93,7 +117,7 @@ export function TorneosSection() {
         ) : null}
 
         {state.status === "ready" || state.status === "empty" ? (
-          <Pagination pagination={state.pagination} />
+          <Pagination pagination={state.pagination} limit={limit} />
         ) : null}
       </div>
     </section>

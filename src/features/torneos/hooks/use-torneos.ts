@@ -10,17 +10,19 @@ export type TorneosState =
   | { status: "ready"; page: number; pagination: Pagination; data: Torneo[] }
   | { status: "error"; page: number; message: string };
 
-export function useTorneos(page: number): TorneosState {
+export function useTorneos(page: number, limit: number | null): TorneosState {
   const [state, setState] = useState<TorneosState>({ status: "loading", page });
+  const [request, setRequest] = useState({ page, limit });
 
-  if (state.page !== page) {
+  if (request.page !== page || request.limit !== limit) {
+    setRequest({ page, limit });
     setState({ status: "loading", page });
   }
 
   useEffect(() => {
     const controller = new AbortController();
 
-    getTorneos(page, controller.signal)
+    getTorneos(page, controller.signal, limit)
       .then((result) => {
         if (controller.signal.aborted) {
           return;
@@ -49,7 +51,7 @@ export function useTorneos(page: number): TorneosState {
       });
 
     return () => controller.abort();
-  }, [page]);
+  }, [page, limit]);
 
   return state;
 }

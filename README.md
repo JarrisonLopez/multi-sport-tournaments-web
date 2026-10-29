@@ -12,7 +12,7 @@ copy .env.example .env.local
 npm run dev
 ```
 
-La variable `NEXT_PUBLIC_API_HOST` es el host de `multi-sport-tournaments-api`. El ejemplo usa `http://localhost:3000`. Este repositorio no define una URL de producción.
+La variable `NEXT_PUBLIC_API_HOST` es el host de `multi-sport-tournaments-api`. El ejemplo usa `http://localhost:3099`. Este repositorio no define una URL de producción.
 
 ## Estado de esta fase
 
