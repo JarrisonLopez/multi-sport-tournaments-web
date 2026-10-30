@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
+import { AuthControls } from "@/features/auth/components/AuthControls";
 
 type Theme = "light" | "dark";
 
@@ -82,6 +83,7 @@ export function SiteHeader() {
           </Link>
 
           <div className="flex shrink-0 items-center gap-3">
+            <AuthControls />
               <button
               type="button"
               className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[4px] border border-[rgba(200,245,66,0.35)] px-3 text-[0.8125rem] font-bold tracking-[0.04em] text-[var(--color-on-dark)] uppercase hover:border-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"

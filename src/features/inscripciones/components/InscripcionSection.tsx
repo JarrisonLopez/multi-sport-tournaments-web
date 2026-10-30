@@ -1,20 +1,81 @@
 "use client";
 
-import { useCatalogo } from "@/features/torneos/components/TorneosSection";
-
-const disponibilidad = [
-  { value: "fines-de-semana", label: "Fines de semana" },
-  { value: "noches", label: "Noches entre semana" },
-  { value: "mananas", label: "Mañanas" },
-  { value: "flexible", label: "Flexible" },
-];
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import {
+  DISPONIBILIDADES,
+  fechaUtcHoy,
+  hasInscripcionErrors,
+  inscripcionErrorsFromMessage,
+  isDisponibilidad,
+  motivoNoInscripcion,
+  validateInscripcion,
+  type Inscripcion,
+  type InscripcionFieldErrors,
+} from "@/features/inscripciones/domain/inscripcion";
+import { createInscripcion } from "@/features/inscripciones/services/create-inscripcion";
+import { HttpError } from "@/features/common/http";
+import { useTorneos } from "@/features/torneos/hooks/use-torneos";
 
 const fieldClass =
   "min-h-11 w-full rounded-[4px] border border-[var(--color-line)] bg-[var(--color-input-bg)] px-3 py-3 text-[var(--color-ink)]";
 
 export function InscripcionSection() {
-  const state = useCatalogo();
-  const torneos = state.status === "ready" ? state.data : [];
+  const user = useAuth();
+  const router = useRouter();
+  const catalogo = useTorneos(1, 50);
+  const hoy = fechaUtcHoy();
+
+  const torneos = catalogo.status === "ready" ? catalogo.data : [];
+  const abiertos = torneos.filter((torneo) => motivoNoInscripcion(torneo, hoy) === null);
+  const cerrados = torneos.flatMap((torneo) => {
+    const motivo = motivoNoInscripcion(torneo, hoy);
+    return motivo === null ? [] : [{ torneo, motivo }];
+  });
+
+  const [torneoId, setTorneoId] = useState("");
+  const [disponibilidad, setDisponibilidad] = useState("");
+  const [mensaje, setMensaje] = useState("");
+  const [errors, setErrors] = useState<InscripcionFieldErrors>({});
+  const [pending, setPending] = useState(false);
+  const [confirmacion, setConfirmacion] = useState<Inscripcion | null>(null);
+
+  const loginHref = "/login?next=%2F%23inscripcion";
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!user) {
+      router.push(loginHref);
+      return;
+    }
+
+    const nextErrors = validateInscripcion({ torneoId, disponibilidad, mensaje }, abiertos);
+    setErrors(nextErrors);
+    if (hasInscripcionErrors(nextErrors) || !isDisponibilidad(disponibilidad)) {
+      return;
+    }
+
+    setPending(true);
+    setConfirmacion(null);
+    try {
+      const creada = await createInscripcion({
+        torneoId,
+        disponibilidad,
+        mensaje,
+      });
+      setConfirmacion(creada);
+      setMensaje("");
+      setDisponibilidad("");
+      setTorneoId("");
+    } catch (error: unknown) {
+      const message = error instanceof HttpError ? error.message : "No se pudo enviar la solicitud.";
+      setErrors(inscripcionErrorsFromMessage(message));
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <section id="inscripcion" className="border-y border-[var(--color-line)] bg-[var(--color-section-alt)] py-[4.5rem] max-[641px]:py-12" aria-labelledby="inscripcion-title">
@@ -28,37 +89,51 @@ export function InscripcionSection() {
           </p>
         </div>
 
-        <form className="max-w-[46rem] rounded-[10px] border border-[var(--color-line)] bg-[var(--color-surface-elevated)] p-8 max-[641px]:p-4">
+        <form className="max-w-[46rem] rounded-[10px] border border-[var(--color-line)] bg-[var(--color-surface-elevated)] p-8 max-[641px]:p-4" onSubmit={onSubmit} noValidate>
           <div className="grid grid-cols-2 gap-6 max-[641px]:grid-cols-1">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="nombre" className="text-[0.9375rem] font-bold">Nombre completo</label>
-              <input id="nombre" name="nombre" type="text" autoComplete="name" placeholder="Ej. Valentina Ríos" className={fieldClass} disabled />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-[0.9375rem] font-bold">Correo electrónico</label>
-              <input id="email" name="email" type="email" autoComplete="email" placeholder="tu@correo.com" className={fieldClass} disabled />
-            </div>
+            <IdentityField id="nombre" label="Nombre completo" value={user?.nombre ?? ""} />
+            <IdentityField id="email" label="Correo electrónico" value={user?.email ?? ""} />
             <div className="flex flex-col gap-2">
               <label htmlFor="torneo" className="text-[0.9375rem] font-bold">Torneo de interés</label>
-              <select id="torneo" name="torneo" className={fieldClass} disabled>
-                <option value="">Selecciona un torneo</option>
-                {torneos.map((torneo) => (
+              <select
+                id="torneo"
+                name="torneoId"
+                className={fieldClass}
+                value={torneoId}
+                disabled={!user || abiertos.length === 0 || pending}
+                aria-invalid={errors.torneoId !== undefined}
+                aria-describedby={errors.torneoId ? "torneo-error" : undefined}
+                onChange={(event) => setTorneoId(event.target.value)}
+              >
+                <option value="">{abiertos.length === 0 ? "No hay torneos disponibles" : "Selecciona un torneo"}</option>
+                {abiertos.map((torneo) => (
                   <option key={torneo.id} value={torneo.id}>
                     {torneo.nombre}
                   </option>
                 ))}
               </select>
+              {errors.torneoId ? <FieldAlert id="torneo-error" message={errors.torneoId} /> : null}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="disponibilidad" className="text-[0.9375rem] font-bold">Disponibilidad preferida</label>
-              <select id="disponibilidad" name="disponibilidad" className={fieldClass} disabled defaultValue="">
+              <select
+                id="disponibilidad"
+                name="disponibilidad"
+                className={fieldClass}
+                value={disponibilidad}
+                disabled={!user || abiertos.length === 0 || pending}
+                aria-invalid={errors.disponibilidad !== undefined}
+                aria-describedby={errors.disponibilidad ? "disponibilidad-error" : undefined}
+                onChange={(event) => setDisponibilidad(event.target.value)}
+              >
                 <option value="">Selecciona una franja</option>
-                {disponibilidad.map((option) => (
+                {DISPONIBILIDADES.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </select>
+              {errors.disponibilidad ? <FieldAlert id="disponibilidad-error" message={errors.disponibilidad} /> : null}
             </div>
             <div className="col-span-full flex flex-col gap-2 max-[641px]:col-span-1">
               <label htmlFor="mensaje" className="text-[0.9375rem] font-bold">Mensaje o comentario</label>
@@ -66,26 +141,111 @@ export function InscripcionSection() {
                 id="mensaje"
                 name="mensaje"
                 rows={4}
+                value={mensaje}
                 placeholder="Cuéntanos tu posición, experiencia o si ya formas parte de un equipo."
                 className={`${fieldClass} min-h-28 resize-y`}
-                disabled
+                disabled={!user || abiertos.length === 0 || pending}
+                aria-invalid={errors.mensaje !== undefined}
+                aria-describedby={errors.mensaje ? "mensaje-error" : undefined}
+                onChange={(event) => setMensaje(event.target.value)}
               />
+              {errors.mensaje ? <FieldAlert id="mensaje-error" message={errors.mensaje} /> : null}
             </div>
           </div>
+
           <div className="mt-6">
-            <button
-              type="button"
-              disabled
-              className="inline-flex min-h-[2.85rem] cursor-not-allowed items-center justify-center rounded-[4px] bg-[var(--color-accent)] px-5 text-[0.9375rem] font-bold text-[var(--color-on-accent)] opacity-60"
-            >
-              Enviar solicitud
-            </button>
+            {user ? (
+              <button
+                type="submit"
+                disabled={pending || abiertos.length === 0}
+                className="inline-flex min-h-[2.85rem] items-center justify-center rounded-[4px] bg-[var(--color-accent)] px-5 text-[0.9375rem] font-bold text-[var(--color-on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {pending ? "Enviando…" : "Enviar solicitud"}
+              </button>
+            ) : (
+              <Link
+                href={loginHref}
+                className="inline-flex min-h-[2.85rem] items-center justify-center rounded-[4px] bg-[var(--color-accent)] px-5 text-[0.9375rem] font-bold text-[var(--color-on-accent)]"
+              >
+                Ingresar para inscribirte
+              </Link>
+            )}
           </div>
-          <p className="mt-4 max-w-none text-[0.9375rem] font-semibold text-[var(--color-muted)]" role="status">
-            El formulario conserva la estructura de la entrega anterior. En esta fase no valida ni envía la solicitud.
-          </p>
+
+          {!user ? (
+            <p className="mt-4 text-[0.9375rem] font-semibold text-[var(--color-muted)]" role="status">
+              Tu nombre y correo salen de la sesión. Inicia sesión para enviar la solicitud.
+            </p>
+          ) : null}
+
+          {catalogo.status === "loading" ? (
+            <p className="mt-4 font-semibold" aria-live="polite">Cargando torneos…</p>
+          ) : null}
+
+          {catalogo.status === "error" ? (
+            <p className="mt-4 font-semibold text-[var(--color-error)]" role="alert">{catalogo.message}</p>
+          ) : null}
+
+          {errors.form ? (
+            <p className="mt-4 font-semibold text-[var(--color-error)]" role="alert">{errors.form}</p>
+          ) : null}
+
+          {confirmacion ? (
+            <p className="mt-4 font-semibold text-[var(--color-ink)]" role="status">
+              Solicitud registrada con el identificador {confirmacion.id}. Puedes verla en{" "}
+              <Link href="/mis-inscripciones" className="underline">
+                Mis inscripciones
+              </Link>
+              .
+            </p>
+          ) : null}
+
+          {cerrados.length > 0 ? (
+            <div className="mt-6">
+              <h3 className="mb-3 text-[1.15rem]">No admiten solicitudes</h3>
+              <ul className="flex flex-col gap-2">
+                {cerrados.map(({ torneo, motivo }) => (
+                  <li key={torneo.id} className="text-[0.9375rem] text-[var(--color-muted)]">
+                    <span className="font-bold text-[var(--color-ink)]">{`${torneo.nombre}. ${motivo}`}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {((catalogo.status === "ready" || catalogo.status === "empty") && abiertos.length === 0) ? (
+            <p className="mt-4 font-semibold text-[var(--color-muted)]" role="status">
+              Ningún torneo publicado admite inscripciones en este momento.
+            </p>
+          ) : null}
         </form>
       </div>
     </section>
+  );
+}
+
+function IdentityField({ id, label, value }: { id: string; label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className="text-[0.9375rem] font-bold">{label}</label>
+      <input
+        id={id}
+        name={id}
+        type={id === "email" ? "email" : "text"}
+        value={value}
+        readOnly
+        aria-readonly="true"
+        placeholder="Disponible al iniciar sesión"
+        className={`${fieldClass} cursor-default`}
+      />
+    </div>
+  );
+}
+
+function FieldAlert({ id, message }: { id: string; message: string }) {
+  return (
+    <p id={id} className="text-[0.9375rem] font-semibold text-[var(--color-error)]" role="alert">
+      {message}
+    </p>
   );
 }

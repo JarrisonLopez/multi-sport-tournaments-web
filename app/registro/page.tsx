@@ -1,10 +1,10 @@
-import { PendingRoute } from "@/features/common/components/PendingRoute";
+import { Suspense } from "react";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
 
 export default function RegistroPage() {
   return (
-    <PendingRoute
-      title="Registro"
-      description="El registro de usuarios todavía no está implementado. Esta ruta queda preparada para la fase de autenticación."
-    />
+    <Suspense fallback={<p className="mx-auto w-[min(100%-2rem,70rem)] py-16 font-semibold">Cargando…</p>}>
+      <RegisterForm />
+    </Suspense>
   );
 }
