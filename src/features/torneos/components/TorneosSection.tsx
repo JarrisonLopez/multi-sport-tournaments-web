@@ -92,7 +92,7 @@ export function TorneosSection() {
         {state.status === "ready" ? (
           <>
             <div
-              className="-mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mb-8 sm:flex-wrap sm:overflow-visible sm:px-0"
+              className="mb-6 flex gap-2 overflow-x-auto pb-1 sm:mb-8 sm:flex-wrap sm:overflow-visible"
               role="group"
               aria-label="Filtrar torneos por deporte"
             >

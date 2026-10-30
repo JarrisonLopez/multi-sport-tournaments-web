@@ -36,11 +36,11 @@ export function AuthControls({ placement, onNavigate }: AuthControlsProps) {
     }
 
     return (
-      <div className="flex min-w-0 items-center gap-1">
+      <div className="flex flex-nowrap items-center gap-1">
         {user.role === "ADMIN" ? (
           <Link
             href="/admin"
-            className="inline-flex min-h-11 items-center px-2 text-[0.9375rem] font-semibold whitespace-nowrap text-[var(--color-on-dark)] hover:text-[var(--color-accent)]"
+            className="inline-flex min-h-11 shrink-0 items-center px-2 text-[0.9375rem] font-semibold whitespace-nowrap text-[var(--color-on-dark)] hover:text-[var(--color-accent)]"
           >
             Administración
           </Link>
@@ -48,13 +48,13 @@ export function AuthControls({ placement, onNavigate }: AuthControlsProps) {
         <Link
           href="/mis-inscripciones"
           title={user.nombre}
-          className="max-w-[10rem] truncate px-2 text-[0.9375rem] font-semibold text-[var(--color-accent)] hover:underline"
+          className="inline-flex min-h-11 max-w-[11rem] min-w-0 items-center truncate px-2 text-[0.9375rem] font-semibold text-[var(--color-accent)] hover:underline"
         >
           {user.nombre}
         </Link>
         <button
           type="button"
-          className="inline-flex min-h-11 items-center px-2 text-[0.9375rem] font-semibold text-[var(--color-on-dark)] hover:text-[var(--color-accent)]"
+          className="inline-flex min-h-11 shrink-0 items-center px-2 text-[0.9375rem] font-semibold whitespace-nowrap text-[var(--color-on-dark)] hover:text-[var(--color-accent)]"
           onClick={logout}
         >
           Salir

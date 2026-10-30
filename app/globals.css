@@ -58,6 +58,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -102,6 +103,7 @@ h3 {
 }
 
 .hero-backdrop {
+  overflow: hidden;
   background:
     linear-gradient(105deg, rgba(7, 26, 20, 0.92) 18%, rgba(15, 61, 46, 0.72) 52%, rgba(7, 26, 20, 0.55) 100%),
     linear-gradient(0deg, rgba(7, 26, 20, 0.55), transparent 40%),
