@@ -60,14 +60,14 @@ export function TorneosSection() {
     deporte === "todos" ? torneos : torneos.filter((torneo) => torneo.deporte === deporte);
 
   return (
-    <section id="torneos" className="py-[4.5rem] max-[641px]:py-12" aria-labelledby="torneos-title">
-      <div className="mx-auto w-[min(100%-2rem,70rem)]">
-        <div className="mb-8 max-w-[46rem]">
-          <h2 id="torneos-title" className="mb-4 text-[clamp(1.75rem,2.4vw,2.35rem)]">
+    <section id="torneos" className="scroll-mt-20 py-12 sm:py-16 lg:py-[4.5rem]" aria-labelledby="torneos-title">
+      <div className="mx-auto w-[min(100%-1.5rem,70rem)] sm:w-[min(100%-2rem,70rem)]">
+        <div className="mb-6 max-w-[46rem] sm:mb-8">
+          <h2 id="torneos-title" className="mb-3 text-[1.7rem] sm:mb-4 sm:text-[clamp(1.85rem,2.4vw,2.35rem)]">
             Torneos activos
           </h2>
-          <p className="text-[var(--color-muted)]">
-            Competencias abiertas en fútbol 7, baloncesto, voleibol y tenis. Filtra por deporte para encontrar el torneo que te interesa.
+          <p className="text-base leading-relaxed text-[var(--color-muted)] sm:text-[1.0625rem]">
+            Competencias publicadas en la plataforma. Filtra por deporte para encontrar el torneo que te interesa.
           </p>
         </div>
 
@@ -91,7 +91,11 @@ export function TorneosSection() {
 
         {state.status === "ready" ? (
           <>
-            <div className="mb-8 flex flex-wrap gap-3" role="group" aria-label="Filtrar torneos por deporte">
+            <div
+              className="-mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mb-8 sm:flex-wrap sm:overflow-visible sm:px-0"
+              role="group"
+              aria-label="Filtrar torneos por deporte"
+            >
               <FilterButton active={deporte === "todos"} label="Todos" onSelect={() => setDeporte("todos")} />
               {deportes.map((torneo) => (
                 <FilterButton
@@ -103,11 +107,21 @@ export function TorneosSection() {
               ))}
             </div>
             {visibles.length === 0 ? (
-              <p className="rounded-[10px] border border-dashed border-[var(--color-line)] p-6 font-semibold text-[var(--color-muted)]">
-                No hay torneos para el deporte seleccionado.
-              </p>
+              <div className="rounded-[10px] border border-dashed border-[var(--color-line)] bg-[var(--color-surface-elevated)] px-5 py-10 text-center">
+                <p className="font-display text-[1.45rem]">Sin resultados</p>
+                <p className="mx-auto mt-2 max-w-[36ch] text-[var(--color-muted)]">
+                  No hay torneos de {deporte} en esta página del catálogo.
+                </p>
+                <button
+                  type="button"
+                  className="mt-5 inline-flex min-h-11 items-center justify-center rounded-[4px] bg-[var(--color-field)] px-5 text-[0.9375rem] font-bold text-[var(--color-on-dark)]"
+                  onClick={() => setDeporte("todos")}
+                >
+                  Ver todos los deportes
+                </button>
+              </div>
             ) : (
-              <div className="grid grid-cols-3 gap-6 max-[901px]:grid-cols-2 max-[641px]:grid-cols-1">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
                 {visibles.map((torneo) => (
                   <TorneoCard key={torneo.id} torneo={torneo} />
                 ))}
@@ -138,7 +152,7 @@ function FilterButton({
       type="button"
       aria-pressed={active}
       onClick={onSelect}
-      className={`min-h-[2.4rem] rounded-[4px] border px-4 text-[0.9375rem] font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
+      className={`inline-flex min-h-11 shrink-0 items-center rounded-[4px] border px-4 text-[0.9375rem] font-bold whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
         active
           ? "border-[var(--color-field)] bg-[var(--color-field)] text-[var(--color-on-dark)]"
           : "border-[var(--color-line)] bg-[var(--color-surface-elevated)] text-[var(--color-ink)]"

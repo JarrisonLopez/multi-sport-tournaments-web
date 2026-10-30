@@ -23,20 +23,20 @@ const courts = [
 
 export function CourtsSection() {
   return (
-    <section id="canchas" className="border-y border-[var(--color-line)] bg-[var(--color-section-alt)] py-[4.5rem] max-[641px]:py-12" aria-labelledby="canchas-title">
-      <div className="mx-auto w-[min(100%-2rem,70rem)]">
-        <div className="mb-8 max-w-[46rem]">
-          <h2 id="canchas-title" className="mb-4 text-[clamp(1.75rem,2.4vw,2.35rem)]">
+    <section id="canchas" className="scroll-mt-20 bg-[var(--color-surface-elevated)] py-12 sm:py-16 lg:py-[4.5rem]" aria-labelledby="canchas-title">
+      <div className="mx-auto w-[min(100%-1.5rem,70rem)] sm:w-[min(100%-2rem,70rem)]">
+        <div className="mb-6 max-w-[46rem] sm:mb-8">
+          <h2 id="canchas-title" className="mb-3 text-[1.7rem] sm:mb-4 sm:text-[clamp(1.85rem,2.4vw,2.35rem)]">
             Canchas y escenarios
           </h2>
-          <p className="text-[var(--color-muted)]">
+          <p className="text-base leading-relaxed text-[var(--color-muted)] sm:text-[1.0625rem]">
             Espacios verificados para programar jornadas según deporte, superficie y disponibilidad.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-6 max-[641px]:grid-cols-1">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
           {courts.map((court) => (
-            <article key={court.name} className="border-t border-[var(--color-line)] py-6">
-              <h3 className="mb-3 text-[1.45rem]">{court.name}</h3>
+            <article key={court.name} className="rounded-[10px] border border-[var(--color-line)] border-t-[3px] border-t-[var(--color-field)] bg-[var(--color-surface)] p-5">
+              <h3 className="mb-3 text-[1.35rem] break-words sm:text-[1.45rem]">{court.name}</h3>
               <p className="text-[var(--color-muted)]">{court.description}</p>
               <ul className="mt-4 grid gap-1.5 text-[0.9375rem]">
                 {court.facts.map((fact) => (

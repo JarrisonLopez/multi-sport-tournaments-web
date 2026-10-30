@@ -13,9 +13,9 @@ export default function HomePage() {
       <PlatformSection />
       <Suspense
         fallback={
-          <section className="py-[4.5rem]" aria-labelledby="torneos-title">
-            <div className="mx-auto w-[min(100%-2rem,70rem)]">
-              <h2 id="torneos-title" className="mb-4 text-[clamp(1.75rem,2.4vw,2.35rem)]">
+          <section className="scroll-mt-20 py-12 sm:py-16" aria-labelledby="torneos-title">
+            <div className="mx-auto w-[min(100%-1.5rem,70rem)] sm:w-[min(100%-2rem,70rem)]">
+              <h2 id="torneos-title" className="mb-3 text-[1.7rem] sm:mb-4 sm:text-[clamp(1.85rem,2.4vw,2.35rem)]">
                 Torneos activos
               </h2>
               <p className="font-semibold">Cargando torneos…</p>
@@ -25,9 +25,9 @@ export default function HomePage() {
       >
         <CatalogoProvider>
           <TorneosSection />
+          <InscripcionSection />
           <CourtsSection />
           <PlayersSection />
-          <InscripcionSection />
         </CatalogoProvider>
       </Suspense>
     </main>

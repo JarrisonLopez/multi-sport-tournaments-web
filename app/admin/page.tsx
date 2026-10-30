@@ -1,10 +1,10 @@
-import { PendingRoute } from "@/features/common/components/PendingRoute";
+import { Suspense } from "react";
+import { AdminPanel } from "@/features/admin/components/AdminPanel";
 
 export default function AdminPage() {
   return (
-    <PendingRoute
-      title="Administración"
-      description="Esta ruta queda reservada para el rol administrador. Todavía no protege el acceso ni administra el catálogo."
-    />
+    <Suspense fallback={<p className="mx-auto w-[min(100%-1.5rem,70rem)] py-12 font-semibold">Cargando administración…</p>}>
+      <AdminPanel />
+    </Suspense>
   );
 }

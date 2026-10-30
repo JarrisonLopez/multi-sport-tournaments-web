@@ -4,9 +4,10 @@ import type { Pagination as PaginationInfo } from "@/features/torneos/domain/tor
 type PaginationProps = {
   pagination: PaginationInfo;
   limit: number | null;
+  hrefFor?: (page: number, limit: number | null) => string;
 };
 
-function pageHref(page: number, limit: number | null): string {
+function catalogHref(page: number, limit: number | null): string {
   const params = new URLSearchParams();
 
   if (page > 1) {
@@ -21,7 +22,7 @@ function pageHref(page: number, limit: number | null): string {
   return `${query.length > 0 ? `/?${query}` : "/"}#torneos`;
 }
 
-export function Pagination({ pagination, limit }: PaginationProps) {
+export function Pagination({ pagination, limit, hrefFor = catalogHref }: PaginationProps) {
   if (pagination.totalPages <= 1) {
     return null;
   }
@@ -30,23 +31,23 @@ export function Pagination({ pagination, limit }: PaginationProps) {
   const next = pagination.page < pagination.totalPages ? pagination.page + 1 : null;
 
   return (
-    <nav aria-label="Paginación de torneos" className="mt-6 flex flex-wrap items-center gap-3 text-[0.9375rem] font-semibold">
+    <nav aria-label="Paginación de torneos" className="mt-8 flex flex-wrap items-center gap-3 text-[0.9375rem] font-semibold">
       {previous ? (
-        <Link href={pageHref(previous, limit)} className="underline-offset-4 hover:underline">
+        <Link href={hrefFor(previous, limit)} className="inline-flex min-h-11 items-center rounded-[4px] border border-[var(--color-line)] px-4 hover:border-[var(--color-field)]">
           Anterior
         </Link>
       ) : (
-        <span className="text-[var(--color-muted)]">Anterior</span>
+        <span className="inline-flex min-h-11 items-center px-4 text-[var(--color-muted)]">Anterior</span>
       )}
       <p>
         Página {pagination.page} de {pagination.totalPages}
       </p>
       {next ? (
-        <Link href={pageHref(next, limit)} className="underline-offset-4 hover:underline">
+        <Link href={hrefFor(next, limit)} className="inline-flex min-h-11 items-center rounded-[4px] border border-[var(--color-line)] px-4 hover:border-[var(--color-field)]">
           Siguiente
         </Link>
       ) : (
-        <span className="text-[var(--color-muted)]">Siguiente</span>
+        <span className="inline-flex min-h-11 items-center px-4 text-[var(--color-muted)]">Siguiente</span>
       )}
     </nav>
   );

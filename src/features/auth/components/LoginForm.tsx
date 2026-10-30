@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { authErrorsFromMessage, hasAuthErrors, validateLogin, type AuthFieldErrors } from "@/features/auth/domain/rules";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useHydrated } from "@/features/auth/hooks/use-hydrated";
 import { login } from "@/features/auth/services/login";
 import { safeNextPath } from "@/features/auth/services/session";
 import { HttpError } from "@/features/common/http";
@@ -14,7 +16,16 @@ const fieldClass =
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const hydrated = useHydrated();
+  const user = useAuth();
   const next = safeNextPath(params.get("next"));
+  const signedInHere = useRef(false);
+
+  useEffect(() => {
+    if (hydrated && user && !signedInHere.current) {
+      router.replace("/");
+    }
+  }, [hydrated, router, user]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<AuthFieldErrors>({});
@@ -30,10 +41,12 @@ export function LoginForm() {
 
     setPending(true);
     try {
+      signedInHere.current = true;
       await login({ email, password });
       router.push(next);
     } catch (error: unknown) {
       const message = error instanceof HttpError ? error.message : "No se pudo iniciar sesión.";
+      signedInHere.current = false;
       setErrors(authErrorsFromMessage(message));
     } finally {
       setPending(false);
@@ -41,6 +54,14 @@ export function LoginForm() {
   }
 
   const registroHref = next === "/" ? "/registro" : `/registro?next=${encodeURIComponent(next)}`;
+
+  if (hydrated && user) {
+    return (
+      <main className="mx-auto w-[min(100%-2rem,70rem)] py-16">
+        <p className="font-semibold" aria-live="polite">Volviendo al inicio…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto w-[min(100%-2rem,70rem)] py-16">

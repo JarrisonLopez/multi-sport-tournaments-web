@@ -8,7 +8,7 @@ type ButtonLinkProps = {
 
 export function ButtonLink({ href, variant, children }: ButtonLinkProps) {
   const shared =
-    "inline-flex min-h-[2.85rem] items-center justify-center rounded-[4px] px-5 text-[0.9375rem] font-bold tracking-[0.02em] transition duration-150 hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transform-none max-[641px]:w-full";
+    "inline-flex min-h-[2.85rem] w-full items-center justify-center rounded-[4px] px-5 text-[0.9375rem] font-bold tracking-[0.02em] transition duration-150 hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transform-none sm:w-auto";
 
   const variantClass =
     variant === "primary"

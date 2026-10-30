@@ -23,20 +23,20 @@ const players = [
 
 export function PlayersSection() {
   return (
-    <section id="jugadores" className="bg-[var(--color-surface-elevated)] py-[4.5rem] max-[641px]:py-12" aria-labelledby="jugadores-title">
-      <div className="mx-auto w-[min(100%-2rem,70rem)]">
-        <div className="mb-8 max-w-[46rem]">
-          <h2 id="jugadores-title" className="mb-4 text-[clamp(1.75rem,2.4vw,2.35rem)]">
+    <section id="jugadores" className="scroll-mt-20 py-12 sm:py-16 lg:py-[4.5rem]" aria-labelledby="jugadores-title">
+      <div className="mx-auto w-[min(100%-1.5rem,70rem)] sm:w-[min(100%-2rem,70rem)]">
+        <div className="mb-6 max-w-[46rem] sm:mb-8">
+          <h2 id="jugadores-title" className="mb-3 text-[1.7rem] sm:mb-4 sm:text-[clamp(1.85rem,2.4vw,2.35rem)]">
             Jugadores destacados
           </h2>
-          <p className="text-[var(--color-muted)]">
+          <p className="text-base leading-relaxed text-[var(--color-muted)] sm:text-[1.0625rem]">
             Participantes activos en la plataforma, listos para inscribirse o completar plantillas.
           </p>
         </div>
-        <div className="grid grid-cols-4 gap-6 max-[901px]:grid-cols-2 max-[641px]:grid-cols-1">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
           {players.map((player) => (
-            <article key={player.name} className="border-t-[3px] border-[var(--color-field)] pt-4">
-              <h3 className="mb-3 text-[1.45rem]">{player.name}</h3>
+            <article key={player.name} className="rounded-[10px] border border-[var(--color-line)] border-t-[3px] border-t-[var(--color-field)] bg-[var(--color-surface-elevated)] p-5">
+              <h3 className="mb-3 text-[1.35rem] break-words sm:text-[1.45rem]">{player.name}</h3>
               <p className="mb-3 text-[0.8125rem] font-bold tracking-[0.06em] text-[var(--color-field-mid)] uppercase">
                 {player.meta}
               </p>

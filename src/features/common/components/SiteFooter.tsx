@@ -1,7 +1,7 @@
 export function SiteFooter() {
   return (
-    <footer className="bg-[var(--color-footer-bg)] py-12 pb-8 text-[var(--color-on-dark)]">
-      <div className="mx-auto grid w-[min(100%-2rem,70rem)] gap-6">
+    <footer className="bg-[var(--color-footer-bg)] py-10 text-[var(--color-on-dark)] sm:py-12">
+      <div className="mx-auto grid w-[min(100%-1.5rem,70rem)] gap-5 sm:w-[min(100%-2rem,70rem)] sm:gap-6">
         <div>
           <p className="font-display text-[1.2rem] leading-tight font-bold tracking-[0.04em] uppercase">
             Multi Sport Tournaments

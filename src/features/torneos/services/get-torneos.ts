@@ -42,7 +42,7 @@ function parsePagination(value: unknown): Pagination | null {
   return { page, pageSize, total, totalPages };
 }
 
-function parseTorneo(value: unknown): Torneo | null {
+export function parseTorneo(value: unknown): Torneo | null {
   if (!isRecord(value)) {
     return null;
   }

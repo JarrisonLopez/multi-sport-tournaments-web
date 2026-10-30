@@ -113,12 +113,19 @@ h3 {
 .hero-backdrop::after {
   content: "";
   position: absolute;
-  inset: auto 8% 18% auto;
+  inset: auto 8% 12% auto;
   width: min(42vw, 28rem);
   aspect-ratio: 1;
   border: 2px solid rgba(200, 245, 66, 0.28);
   border-radius: 50%;
   transform: translate(10%, 10%);
+}
+
+@media (max-width: 767px) {
+  .hero-backdrop::after {
+    content: none;
+    display: none;
+  }
 }
 
 .hero-content {
